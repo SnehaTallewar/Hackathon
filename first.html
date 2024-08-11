@@ -1,0 +1,183 @@
+<!doctype html>
+  <head>
+    <title>neutron-star</title>
+    <link rel="stylesheet" href="first.css" />
+    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Rubik:ital,wght@0,300..900;1,300..900&display=swap" rel="stylesheet">
+  </head>
+  <body>
+    <h1 class="heading">
+      CHOOSE THE STARS TO <br />
+      BUILD A NEUTRON STAR !!
+    </h1>
+    <div class="buttons">
+      
+      <button id="btn-1">neutron-star -1</button>
+      <button id="btn-2">neutron-star -2</button>
+      <button id="blast-btn"> Blast! </button>
+    </div>
+    <div id="n-container">
+      <div class="stars"></div>
+      <canvas id="myCanvas" width="600" height="400"></canvas>
+      <div id="blast"></div>
+      <div id="nstar"></div>
+    </div>
+    <body>
+      <script>
+      function createStars(numStars) {
+        const starField = document.querySelector(".stars");
+        for (let i = 0; i < numStars; i++) {
+          const star = document.createElement("div");
+          star.className = "star";
+          const size = Math.random() * 2 + 1;
+          const x = Math.random() * window.innerWidth;
+          const y = Math.random() * window.innerHeight;
+          star.style.width = size + "px";
+          star.style.height = size + "px";
+          star.style.top = y + "px";
+          star.style.left = x + "px";
+          star.style.opacity = Math.random() * 0.8 + 0.2;
+          starField.appendChild(star);
+        }
+      }
+
+      createStars(500);
+   
+      const canvas = document.getElementById("myCanvas");
+      const ctx = canvas.getContext("2d");
+      const blast = document.getElementById("blast");
+      const nstar = document.getElementById("nstar");
+      const btn1 = document.getElementById("btn-1");
+      const btn2 = document.getElementById("btn-2");
+      const blastbtn=document.getElementById("blast-btn");
+      let ball1 = {
+        x: 100,
+        y: canvas.height / 2,
+        radius: 30,
+        dx: 2,
+        dy: 0,
+        image: new Image(),
+        visible: false,
+      };
+      
+      let ball2 = {
+        x: canvas.width - 100,
+        y: canvas.height / 2,
+        radius: 30,
+        dx: -2,
+        dy: 0,
+        image: new Image(),
+        visible: false,
+      };
+      
+      ball1.image.src = "./components/star.png";
+      ball2.image.src = "./components/star.png";
+      let imagesLoaded = 0;
+      
+      function onImageLoad() {
+        imagesLoaded++;
+        if (imagesLoaded === 2) {
+          draw();
+        }
+      }
+      
+      ball1.image.onload = onImageLoad;
+      ball2.image.onload = onImageLoad;
+      
+      function drawBall(ball) {
+        if (ball.image.complete && ball.visible) {
+          ctx.drawImage(
+            ball.image,
+            ball.x - ball.radius,
+            ball.y - ball.radius,
+            ball.radius * 2,
+            ball.radius * 2
+          );
+        }
+      }
+      
+      function detectCollision(ball1, ball2) {
+        let dx = ball2.x - ball1.x;
+        let dy = ball2.y - ball1.y;
+        let distance = Math.sqrt(dx * dx + dy * dy);
+        return distance < ball1.radius + ball2.radius;
+      }
+      
+      function updateBallPosition(ball) {
+        if(ball.moving) {
+        ball.x += ball.dx;
+        ball.y += ball.dy;
+        }
+      }
+      
+      function triggerBlast(x, y) {
+        blast.style.center= `${x - blast.clientWidth / 2}px`;
+        blast.style.center = `${y - blast.clientHeight / 2}px`;
+        blast.style.opacity = "1";
+      
+        setTimeout(() => {
+          blast.style.opacity = "0";
+        }, 500);
+      
+        setTimeout(() => {
+          blast.style.display = "none";
+          nstar.style.center = `${x - nstar.clientWidth / 2}px`;
+          nstar.style.center = `${y - nstar.clientHeight / 2}px`;
+          nstar.style.opacity = "1";
+      
+          setTimeout(() => {
+            nstar.style.opacity = "1";
+          }, 1000);
+        }, 500);
+      }
+      let collisionX, collisionY;
+      
+      function draw() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        drawBall(ball1);
+        drawBall(ball2);
+      
+        if (ball1.visible && ball2.visible) {
+          if (!detectCollision(ball1, ball2)) {
+            updateBallPosition(ball1);
+            updateBallPosition(ball2);
+          } else {
+            ball1.dx = 0;
+            ball1.dy = 0;
+            ball2.dx = 0;
+            ball2.dy = 0;
+            ball1.moving = false;
+      ball2.moving = false;
+            ball1.visible = false;
+            ball2.visible = false;
+            collisionX = (ball1.x + ball2.x) / 2;
+            collisionY = (ball1.y + ball2.y) / 2;
+            triggerBlast(collisionX,collisionY);
+      
+           
+          }
+        }
+      
+        requestAnimationFrame(draw);
+      }
+      
+      // Buttons to make the balls appear
+      btn1.addEventListener('click', () => {
+        ball1.visible = true;
+        if (imagesLoaded === 2) {
+          draw();
+        }
+      });
+      
+      btn2.addEventListener('click', () => {
+        ball2.visible = true;
+        if (imagesLoaded === 2) {
+          draw();
+        }});
+        blastbtn.addEventListener('click', () => {
+  ball1.moving = true;
+  ball2.moving = true;
+});  
+      
+      </script>
+  </body>
+</html>

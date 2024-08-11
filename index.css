@@ -1,0 +1,16 @@
+@font-face {
+    font-family: Retro;
+    src: url('./fonts/04B_30__.TTF');
+}
+.container {
+    background:url('./components/pinterestdownloader.com-1723027434.615343.gif');
+    background-size: cover;
+    height: 100vh;
+}
+.heading-text{
+    font-family: Retro;
+    font-size: 100px;
+    color: white;
+    display: flex;
+    justify-content: center;
+}
